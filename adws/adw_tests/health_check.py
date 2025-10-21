@@ -66,8 +66,8 @@ class HealthCheckResult(BaseModel):
 def check_env_vars() -> CheckResult:
     """Check required environment variables."""
     required_vars = {
-        "ANTHROPIC_API_KEY": "Anthropic API Key for Claude Code",
-        "CLAUDE_CODE_PATH": "Path to Claude Code CLI (defaults to 'claude')",
+        "OPENROUTER_API_KEY": "Anthropic API Key for Claude Code",
+        "CLAUDE_CODE_ROUTER_PATH": "Path to Claude Code CLI (defaults to 'claude')",
     }
 
     optional_vars = {
@@ -87,7 +87,7 @@ def check_env_vars() -> CheckResult:
     # Check required vars
     for var, desc in required_vars.items():
         if not os.getenv(var):
-            if var == "CLAUDE_CODE_PATH":
+            if var == "CLAUDE_CODE_ROUTER_PATH":
                 # This has a default, so not critical
                 continue
             missing_required.append(f"{var} ({desc})")
@@ -105,7 +105,7 @@ def check_env_vars() -> CheckResult:
         details={
             "missing_required": missing_required,
             "missing_optional": missing_optional,
-            "claude_code_path": os.getenv("CLAUDE_CODE_PATH", "claude"),
+            "claude_code_router_path": os.getenv("CLAUDE_CODE_ROUTER_PATH", "ccr"),
         },
     )
 
@@ -139,7 +139,7 @@ def check_git_repo() -> CheckResult:
 
 def check_claude_code() -> CheckResult:
     """Test Claude Code CLI functionality."""
-    claude_path = os.getenv("CLAUDE_CODE_PATH", "claude")
+    claude_path = os.getenv("CLAUDE_CODE_ROUTER_PATH", "ccr")
 
     # First check if Claude Code is installed
     try:
@@ -154,7 +154,7 @@ def check_claude_code() -> CheckResult:
     except FileNotFoundError:
         return CheckResult(
             success=False,
-            error=f"Claude Code CLI not found at '{claude_path}'. Please install or set CLAUDE_CODE_PATH correctly.",
+            error=f"Claude Code CLI not found at '{claude_path}'. Please install or set CLAUDE_CODE_ROUTER_PATH correctly.",
         )
 
     # Test with a simple prompt
@@ -173,6 +173,7 @@ def check_claude_code() -> CheckResult:
         # Run Claude Code
         cmd = [
             claude_path,
+            "code"
             "-p",
             test_prompt,
             "--model",
@@ -297,7 +298,7 @@ def run_health_check() -> HealthCheckResult:
             result.errors.append(gh_check.error)
 
     # Check Claude Code - only if we have the API key
-    if os.getenv("ANTHROPIC_API_KEY"):
+    if os.getenv("OPENROUTER_API_KEY"):
         claude_check = check_claude_code()
         result.checks["claude_code"] = claude_check
         if not claude_check.success:
@@ -307,7 +308,7 @@ def run_health_check() -> HealthCheckResult:
     else:
         result.checks["claude_code"] = CheckResult(
             success=False,
-            details={"skipped": True, "reason": "ANTHROPIC_API_KEY not set"},
+            details={"skipped": True, "reason": "OPENROUTER_API_KEY not set"},
         )
 
     return result
@@ -370,8 +371,8 @@ def main():
     # Print next steps
     if not result.success:
         print("\n📝 Next Steps:")
-        if any("ANTHROPIC_API_KEY" in e for e in result.errors):
-            print("   1. Set ANTHROPIC_API_KEY in your .env file")
+        if any("OPENROUTER_API_KEY" in e for e in result.errors):
+            print("   1. Set OPENROUTER_API_KEY in your .env file")
         if any("GITHUB_PAT" in e for e in result.errors):
             print("   2. Set GITHUB_PAT in your .env file")
         if any("GitHub CLI" in e for e in result.errors):

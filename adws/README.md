@@ -47,7 +47,7 @@ ADW uses persistent state files (`agents/{adw_id}/adw_state.json`) to:
 ```bash
 export GITHUB_REPO_URL="https://github.com/owner/repository"
 export ANTHROPIC_API_KEY="sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-export CLAUDE_CODE_PATH="/path/to/claude"  # Optional, defaults to "claude"
+export CLAUDE_CODE_ROUTER_PATH="/path/to/ccr"  # Optional, defaults to "ccr"
 export GITHUB_PAT="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  # Optional, only if using different account than 'gh auth login'
 ```
 
@@ -747,9 +747,9 @@ Each slash command has a configured model for both base and heavy sets:
 
 ```python
 SLASH_COMMAND_MODEL_MAP = {
-    "/implement": {"base": "sonnet", "heavy": "opus"},
-    "/review": {"base": "sonnet", "heavy": "opus"},
-    "/classify_issue": {"base": "sonnet", "heavy": "sonnet"},
+    "/implement": {"base": "grok-4-fast", "heavy": "grok-4-latest"},
+    "/review": {"base": "grok-4-fast", "heavy": "grok-4-latest"},
+    "/classify_issue": {"base": "grok-4-fast", "heavy": "grok-4-fast"},
     # ... etc
 }
 ```

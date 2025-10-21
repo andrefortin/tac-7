@@ -48,12 +48,12 @@ def test_model_mapping_lookups():
     
     test_cases = [
         # (command, model_set, expected)
-        ("/implement", "base", "sonnet"),
-        ("/implement", "heavy", "opus"),
-        ("/classify_issue", "base", "sonnet"),
-        ("/classify_issue", "heavy", "sonnet"),  # Both use sonnet
-        ("/review", "base", "sonnet"),
-        ("/review", "heavy", "sonnet"),  # Both use sonnet
+        ("/implement", "base", "grok-4-fast"),
+        ("/implement", "heavy", "grok-4-latest"),
+        ("/classify_issue", "base", "grok-4-fast"),
+        ("/classify_issue", "heavy", "grok-4-fast"),  # Both use sonnet
+        ("/review", "base", "grok-4-fast"),
+        ("/review", "heavy", "grok-4-fast"),  # Both use sonnet
     ]
     
     all_passed = True
@@ -109,7 +109,7 @@ def test_get_model_for_slash_command():
     )
     
     model = get_model_for_slash_command(request)
-    expected_base = "sonnet"
+    expected_base = "grok-4-fast"
     if model == expected_base:
         print(f"✅ With model_set='base': /implement → {model}")
     else:
@@ -121,7 +121,7 @@ def test_get_model_for_slash_command():
     
     # Force reload the state by creating a new request
     model = get_model_for_slash_command(request)
-    expected_heavy = "opus"
+    expected_heavy = "grok-4-latest"
     if model == expected_heavy:
         print(f"✅ With model_set='heavy': /implement → {model}")
     else:
@@ -136,7 +136,7 @@ def test_get_model_for_slash_command():
     )
     
     model = get_model_for_slash_command(request_no_state)
-    expected_default = "sonnet"
+    expected_default = "grok-4-fast"
     if model == expected_default:
         print(f"✅ With no state: /review → {model} (default to base)")
     else:

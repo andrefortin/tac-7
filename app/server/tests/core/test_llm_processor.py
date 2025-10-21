@@ -101,7 +101,7 @@ class TestLLMProcessor:
         mock_client.messages.create.return_value = mock_response
         
         # Mock environment variable
-        with patch.dict(os.environ, {'ANTHROPIC_API_KEY': 'test-key'}):
+        with patch.dict(os.environ, {'OPENROUTER_API_KEY': 'test-key'}):
             query_text = "Show me products under $100"
             schema_info = {
                 'tables': {
@@ -133,7 +133,7 @@ class TestLLMProcessor:
         mock_response.content[0].text = "```\nSELECT * FROM orders\n```"
         mock_client.messages.create.return_value = mock_response
         
-        with patch.dict(os.environ, {'ANTHROPIC_API_KEY': 'test-key'}):
+        with patch.dict(os.environ, {'OPENROUTER_API_KEY': 'test-key'}):
             query_text = "Show all orders"
             schema_info = {'tables': {}}
             
@@ -150,7 +150,7 @@ class TestLLMProcessor:
             with pytest.raises(Exception) as exc_info:
                 generate_sql_with_anthropic(query_text, schema_info)
             
-            assert "ANTHROPIC_API_KEY environment variable not set" in str(exc_info.value)
+            assert "OPENROUTER_API_KEY environment variable not set" in str(exc_info.value)
     
     @patch('core.llm_processor.Anthropic')
     def test_generate_sql_with_anthropic_api_error(self, mock_anthropic_class):
@@ -159,7 +159,7 @@ class TestLLMProcessor:
         mock_anthropic_class.return_value = mock_client
         mock_client.messages.create.side_effect = Exception("API Error")
         
-        with patch.dict(os.environ, {'ANTHROPIC_API_KEY': 'test-key'}):
+        with patch.dict(os.environ, {'OPENROUTER_API_KEY': 'test-key'}):
             query_text = "Show all orders"
             schema_info = {'tables': {}}
             
@@ -207,7 +207,7 @@ class TestLLMProcessor:
         # Test that OpenAI is used when OpenAI key exists (regardless of request preference)
         mock_openai_func.return_value = "SELECT * FROM users"
         
-        with patch.dict(os.environ, {'OPENAI_API_KEY': 'openai-key', 'ANTHROPIC_API_KEY': 'anthropic-key'}):
+        with patch.dict(os.environ, {'OPENAI_API_KEY': 'openai-key', 'OPENROUTER_API_KEY': 'anthropic-key'}):
             request = QueryRequest(query="Show all users", llm_provider="anthropic")
             schema_info = {'tables': {}}
             
@@ -221,7 +221,7 @@ class TestLLMProcessor:
         # Test that Anthropic is used when only Anthropic key exists
         mock_anthropic_func.return_value = "SELECT * FROM products"
         
-        with patch.dict(os.environ, {'ANTHROPIC_API_KEY': 'anthropic-key'}, clear=True):
+        with patch.dict(os.environ, {'OPENROUTER_API_KEY': 'anthropic-key'}, clear=True):
             request = QueryRequest(query="Show all products", llm_provider="openai")
             schema_info = {'tables': {}}
             
@@ -263,7 +263,7 @@ class TestLLMProcessor:
         # Test that OpenAI has priority when both keys exist
         mock_openai_func.return_value = "SELECT * FROM inventory"
         
-        with patch.dict(os.environ, {'OPENAI_API_KEY': 'openai-key', 'ANTHROPIC_API_KEY': 'anthropic-key'}):
+        with patch.dict(os.environ, {'OPENAI_API_KEY': 'openai-key', 'OPENROUTER_API_KEY': 'anthropic-key'}):
             request = QueryRequest(query="Show inventory", llm_provider="anthropic")
             schema_info = {'tables': {}}
             

@@ -14,7 +14,7 @@ Usage: uv run trigger_webhook.py
 
 Environment Requirements:
 - PORT: Server port (default: 8001)
-- All workflow requirements (GITHUB_PAT, ANTHROPIC_API_KEY, etc.)
+- All workflow requirements (GITHUB_PAT, OPENROUTER_API_KEY, etc.)
 """
 
 import os

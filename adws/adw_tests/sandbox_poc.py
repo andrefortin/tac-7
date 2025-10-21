@@ -32,11 +32,11 @@ from dotenv import load_dotenv
 from e2b_code_interpreter import Sandbox
 
 load_dotenv()
-api_key = os.getenv("ANTHROPIC_API_KEY", "")
+api_key = os.getenv("OPENROUTER_API_KEY", "")
 
 print("=== E2B + Claude Code Integration POC ===\n")
 
-with Sandbox(envs={"ANTHROPIC_API_KEY": api_key}) as sandbox:
+with Sandbox(envs={"OPENROUTER_API_KEY": api_key}) as sandbox:
     print(f"✓ Sandbox created: {sandbox.sandbox_id}")
     
     # Setup npm and install Claude Code
@@ -51,7 +51,7 @@ with Sandbox(envs={"ANTHROPIC_API_KEY": api_key}) as sandbox:
     # Test 1: Direct command line execution
     print("\n--- Test 1: Direct CLI execution ---")
     result = sandbox.commands.run(
-        "~/.npm-global/bin/claude -p 'What is 2+2?' --output-format text --dangerously-skip-permissions < /dev/null",
+        "~/.npm-global/bin/ccr code -p 'What is 2+2?' --output-format text --dangerously-skip-permissions < /dev/null",
         timeout=30000
     )
     print(f"Q: What is 2+2?")
@@ -60,7 +60,7 @@ with Sandbox(envs={"ANTHROPIC_API_KEY": api_key}) as sandbox:
     # Test 2: JSON output format
     print("\n--- Test 2: JSON output format ---")
     result = sandbox.commands.run(
-        "~/.npm-global/bin/claude -p 'What is the capital of France?' --output-format json --dangerously-skip-permissions < /dev/null",
+        "~/.npm-global/bin/ccr code -p 'What is the capital of France?' --output-format json --dangerously-skip-permissions < /dev/null",
         timeout=30000
     )
     print(f"Q: What is the capital of France?")
@@ -79,11 +79,11 @@ import os
 import json
 
 # Build full path to claude
-claude_path = os.path.expanduser('~/.npm-global/bin/claude')
+claude_path = os.path.expanduser('~/.npm-global/bin/ccr')
 
 # Critical: stdin=subprocess.DEVNULL prevents hanging in non-TTY environments
 result = subprocess.run(
-    [claude_path, '-p', 'List 3 prime numbers', '--output-format', 'json', '--dangerously-skip-permissions'],
+    [claude_path, 'code', '-p', 'List 3 prime numbers', '--output-format', 'json', '--dangerously-skip-permissions'],
     stdin=subprocess.DEVNULL,
     capture_output=True,
     text=True,

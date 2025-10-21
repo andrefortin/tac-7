@@ -168,8 +168,8 @@ def check_env_vars(logger: Optional[logging.Logger] = None) -> None:
         SystemExit: If required environment variables are missing
     """
     required_vars = [
-        "ANTHROPIC_API_KEY",
-        "CLAUDE_CODE_PATH",
+        "OPENROUTER_API_KEY",
+        "CLAUDE_CODE_ROUTER_PATH",
     ]
     missing_vars = [var for var in required_vars if not os.getenv(var)]
 
@@ -198,14 +198,14 @@ def get_safe_subprocess_env() -> Dict[str, str]:
     """
     safe_env_vars = {
         # Anthropic Configuration (required)
-        "ANTHROPIC_API_KEY": os.getenv("ANTHROPIC_API_KEY"),
+        "OPENROUTER_API_KEY": os.getenv("OPENROUTER_API_KEY"),
         
         # GitHub Configuration (optional)
         # GITHUB_PAT is optional - if not set, will use default gh auth
         "GITHUB_PAT": os.getenv("GITHUB_PAT"),
         
         # Claude Code Configuration
-        "CLAUDE_CODE_PATH": os.getenv("CLAUDE_CODE_PATH", "claude"),
+        "CLAUDE_CODE_ROUTER_PATH": os.getenv("CLAUDE_CODE_ROUTER_PATH", "ccr"),
         "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": os.getenv(
             "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR", "true"
         ),

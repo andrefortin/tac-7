@@ -217,7 +217,7 @@ Set these environment variables before running ADW:
 ```bash
 export GITHUB_REPO_URL="https://github.com/owner/repository"
 export ANTHROPIC_API_KEY="sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-export CLAUDE_CODE_PATH="/path/to/claude"  # Optional, defaults to "claude"
+export CLAUDE_CODE_ROUTER_PATH="/path/to/ccr"  # Optional, defaults to "ccr"
 export GITHUB_PAT="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  # Optional, only if using different account than 'gh auth login'
 ```
 

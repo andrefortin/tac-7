@@ -23,34 +23,34 @@ from .data_types import (
 load_dotenv()
 
 # Get Claude Code CLI path from environment
-CLAUDE_PATH = os.getenv("CLAUDE_CODE_PATH", "claude")
+CLAUDE_PATH = os.getenv("CLAUDE_CODE_ROUTER_PATH", "ccr")
 
 # Model selection mapping for slash commands
 # Maps each command to its model configuration for base and heavy model sets
 SLASH_COMMAND_MODEL_MAP: Final[Dict[SlashCommand, Dict[ModelSet, str]]] = {
-    "/classify_issue": {"base": "sonnet", "heavy": "sonnet"},
-    "/classify_adw": {"base": "sonnet", "heavy": "sonnet"},
-    "/generate_branch_name": {"base": "sonnet", "heavy": "sonnet"},
-    "/implement": {"base": "sonnet", "heavy": "opus"},
-    "/test": {"base": "sonnet", "heavy": "sonnet"},
-    "/resolve_failed_test": {"base": "sonnet", "heavy": "opus"},
-    "/test_e2e": {"base": "sonnet", "heavy": "sonnet"},
-    "/resolve_failed_e2e_test": {"base": "sonnet", "heavy": "opus"},
-    "/review": {"base": "sonnet", "heavy": "sonnet"},
-    "/document": {"base": "sonnet", "heavy": "opus"},
-    "/commit": {"base": "sonnet", "heavy": "sonnet"},
-    "/pull_request": {"base": "sonnet", "heavy": "sonnet"},
-    "/chore": {"base": "sonnet", "heavy": "opus"},
-    "/bug": {"base": "sonnet", "heavy": "opus"},
-    "/feature": {"base": "sonnet", "heavy": "opus"},
-    "/patch": {"base": "sonnet", "heavy": "opus"},
-    "/install_worktree": {"base": "sonnet", "heavy": "sonnet"},
-    "/track_agentic_kpis": {"base": "sonnet", "heavy": "sonnet"},
+    "/classify_issue": {"base": "grok-4-fast", "heavy": "grok-4-fast"},
+    "/classify_adw": {"base": "grok-4-fast", "heavy": "grok-4-fast"},
+    "/generate_branch_name": {"base": "grok-4-fast", "heavy": "grok-4-fast"},
+    "/implement": {"base": "grok-4-fast", "heavy": "grok-4-latest"},
+    "/test": {"base": "grok-4-fast", "heavy": "grok-4-fast"},
+    "/resolve_failed_test": {"base": "grok-4-fast", "heavy": "grok-4-latest"},
+    "/test_e2e": {"base": "grok-4-fast", "heavy": "grok-4-fast"},
+    "/resolve_failed_e2e_test": {"base": "grok-4-fast", "heavy": "grok-4-latest"},
+    "/review": {"base": "grok-4-fast", "heavy": "grok-4-fast"},
+    "/document": {"base": "grok-4-fast", "heavy": "grok-4-latest"},
+    "/commit": {"base": "grok-4-fast", "heavy": "grok-4-fast"},
+    "/pull_request": {"base": "grok-4-fast", "heavy": "grok-4-fast"},
+    "/chore": {"base": "grok-4-fast", "heavy": "grok-4-latest"},
+    "/bug": {"base": "grok-4-fast", "heavy": "grok-4-latest"},
+    "/feature": {"base": "grok-4-fast", "heavy": "grok-4-latest"},
+    "/patch": {"base": "grok-4-fast", "heavy": "grok-4-latest"},
+    "/install_worktree": {"base": "grok-4-fast", "heavy": "grok-4-fast"},
+    "/track_agentic_kpis": {"base": "grok-4-fast", "heavy": "grok-4-fast"},
 }
 
 
 def get_model_for_slash_command(
-    request: AgentTemplateRequest, default: str = "sonnet"
+    request: AgentTemplateRequest, default: str = "grok-4-fast"
 ) -> str:
     """Get the appropriate model for a template request based on ADW state and slash command.
 
@@ -62,7 +62,7 @@ def get_model_for_slash_command(
         default: Default model if not found in mapping
 
     Returns:
-        Model name to use (e.g., "sonnet" or "opus")
+        Model name to use (e.g., "grok-4-fast" or "grok-4-latest")
     """
     # Import here to avoid circular imports
     from .state import ADWState
@@ -148,7 +148,7 @@ def check_claude_installed() -> Optional[str]:
     """Check if Claude Code CLI is installed. Return error message if not."""
     try:
         result = subprocess.run(
-            [CLAUDE_PATH, "--version"], capture_output=True, text=True
+            [CLAUDE_PATH, "-v"], capture_output=True, text=True
         )
         if result.returncode != 0:
             return (
@@ -323,7 +323,7 @@ def prompt_claude_code(request: AgentPromptRequest) -> AgentPromptResponse:
         os.makedirs(output_dir, exist_ok=True)
 
     # Build command - always use stream-json format and verbose
-    cmd = [CLAUDE_PATH, "-p", request.prompt]
+    cmd = [CLAUDE_PATH, "code" "-p", request.prompt]
     cmd.extend(["--model", request.model])
     cmd.extend(["--output-format", "stream-json"])
     cmd.append("--verbose")
@@ -522,8 +522,8 @@ def execute_template(request: AgentTemplateRequest) -> AgentPromptResponse:
             args=["plan.md"],
             adw_id="abc12345"
         )
-        # If state has model_set="heavy", this will use "opus"
-        # If state has model_set="base" or missing, this will use "sonnet"
+        # If state has model_set="heavy", this will use "grok-4-latest"
+        # If state has model_set="base" or missing, this will use "grok-4-fast"
         response = execute_template(request)
     """
     # Get the appropriate model for this request

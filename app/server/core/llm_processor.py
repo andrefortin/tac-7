@@ -71,9 +71,9 @@ def generate_sql_with_anthropic(query_text: str, schema_info: Dict[str, Any]) ->
     """
     try:
         # Get API key from environment
-        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        api_key = os.environ.get("OPENROUTER_API_KEY")
         if not api_key:
-            raise ValueError("ANTHROPIC_API_KEY environment variable not set")
+            raise ValueError("OPENROUTER_API_KEY environment variable not set")
         
         client = Anthropic(api_key=api_key)
         
@@ -202,9 +202,9 @@ def generate_random_query_with_anthropic(schema_info: Dict[str, Any]) -> str:
     """
     try:
         # Get API key from environment
-        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        api_key = os.environ.get("OPENROUTER_API_KEY")
         if not api_key:
-            raise ValueError("ANTHROPIC_API_KEY environment variable not set")
+            raise ValueError("OPENROUTER_API_KEY environment variable not set")
         
         client = Anthropic(api_key=api_key)
         
@@ -254,7 +254,7 @@ def generate_random_query(schema_info: Dict[str, Any]) -> str:
     Priority: 1) OpenAI API key exists, 2) Anthropic API key exists
     """
     openai_key = os.environ.get("OPENAI_API_KEY")
-    anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
+    anthropic_key = os.environ.get("OPENROUTER_API_KEY")
     
     # Check API key availability (OpenAI priority)
     if openai_key:
@@ -262,7 +262,7 @@ def generate_random_query(schema_info: Dict[str, Any]) -> str:
     elif anthropic_key:
         return generate_random_query_with_anthropic(schema_info)
     else:
-        raise ValueError("No LLM API key found. Please set either OPENAI_API_KEY or ANTHROPIC_API_KEY")
+        raise ValueError("No LLM API key found. Please set either OPENAI_API_KEY or OPENROUTER_API_KEY")
 
 def generate_sql(request: QueryRequest, schema_info: Dict[str, Any]) -> str:
     """
@@ -270,7 +270,7 @@ def generate_sql(request: QueryRequest, schema_info: Dict[str, Any]) -> str:
     Priority: 1) OpenAI API key exists, 2) Anthropic API key exists, 3) request.llm_provider
     """
     openai_key = os.environ.get("OPENAI_API_KEY")
-    anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
+    anthropic_key = os.environ.get("OPENROUTER_API_KEY")
     
     # Check API key availability first (OpenAI priority)
     if openai_key:

@@ -25,7 +25,7 @@ from adw_modules.utils import make_adw_id
 load_dotenv()
 
 # Test configuration
-MODELS = ["opus", "sonnet"]
+MODELS = ["grok-4-latest", "grok-4-fast"]
 TEST_PROMPT = """You are a helpful assistant. Please respond to this test with:
 1. Confirm you received this message
 2. State which model you are (opus or sonnet)
@@ -92,7 +92,7 @@ def test_retry_functionality(adw_id: str) -> tuple[bool, str]:
         prompt=test_prompt,
         adw_id=adw_id,
         agent_name="retry_test",
-        model="sonnet",
+        model="grok-4-fast",
         dangerously_skip_permissions=True,
         output_file=output_file
     )
