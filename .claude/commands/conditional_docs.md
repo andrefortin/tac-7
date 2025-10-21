@@ -70,3 +70,9 @@ This prompt helps you determine what documentation you should read based on the 
     - When working with upload button text or labeling
     - When implementing UI text changes for data upload functionality
     - When troubleshooting upload button display or terminology
+
+- app_docs/feature-adw-fe319214-increase-drop-zone-area.md
+  - Conditions:
+    - When working with file upload and drag-and-drop functionality
+    - When implementing UI interactions for data uploads
+    - When troubleshooting drop zone or upload errors
