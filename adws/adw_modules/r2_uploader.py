@@ -82,6 +82,9 @@ class R2Uploader:
         
         try:
             # Upload file
+            if not self.client:
+                self.logger.error("R2 client not initialized")
+                return None
             self.client.upload_file(file_path, self.bucket_name, object_key)
             self.logger.info(f"Uploaded {file_path} to R2 as {object_key}")
             

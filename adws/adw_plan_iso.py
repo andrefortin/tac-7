@@ -49,7 +49,11 @@ from adw_modules.workflow_ops import (
     AGENT_PLANNER,
 )
 from adw_modules.utils import setup_logger, check_env_vars
-from adw_modules.data_types import GitHubIssue, IssueClassSlashCommand, AgentTemplateRequest
+from adw_modules.data_types import (
+    GitHubIssue,
+    IssueClassSlashCommand,
+    AgentTemplateRequest,
+)
 from adw_modules.agent import execute_template
 from adw_modules.worktree_ops import (
     create_worktree,
@@ -59,8 +63,6 @@ from adw_modules.worktree_ops import (
     find_next_available_ports,
     setup_worktree_environment,
 )
-
-
 
 
 def main():
@@ -82,11 +84,15 @@ def main():
 
     # Load the state that was created/found by ensure_adw_id
     state = ADWState.load(adw_id, temp_logger)
+    if not state:
+        # Create new state if load failed
+        state = ADWState(adw_id)
+        state.update(adw_id=adw_id)
 
     # Ensure state has the adw_id field
     if not state.get("adw_id"):
         state.update(adw_id=adw_id)
-    
+
     # Track that this ADW workflow has run
     state.append_adw_id("adw_plan_iso")
 
@@ -94,43 +100,68 @@ def main():
     logger = setup_logger(adw_id, "adw_plan_iso")
     logger.info(f"ADW Plan Iso starting - ID: {adw_id}, Issue: {issue_number}")
 
+    print("Validate environment")
+
     # Validate environment
     check_env_vars(logger)
 
     # Get repo information
     try:
+        print("Get GitHub repo URL")
         github_repo_url = get_repo_url()
+        logger.info(f"GitHub repo URL: {github_repo_url}")
+        print("Extract repo path")
         repo_path = extract_repo_path(github_repo_url)
+        print(f"Repo path: {repo_path}")
     except ValueError as e:
         logger.error(f"Error getting repository URL: {e}")
         sys.exit(1)
 
     # Check if worktree already exists
     valid, error = validate_worktree(adw_id, state)
+    worktree_path = None  # Initialize to avoid unbound variable
+
     if valid:
         logger.info(f"Using existing worktree for {adw_id}")
         worktree_path = state.get("worktree_path")
+        if not worktree_path:
+            logger.error("No worktree path found in state")
+            sys.exit(1)
         backend_port = state.get("backend_port")
         frontend_port = state.get("frontend_port")
+        if not backend_port or not frontend_port:
+            logger.error("No ports found in state for existing worktree")
+            sys.exit(1)
     else:
         # Allocate ports for this instance
         backend_port, frontend_port = get_ports_for_adw(adw_id)
-        
+
         # Check port availability
         if not (is_port_available(backend_port) and is_port_available(frontend_port)):
-            logger.warning(f"Deterministic ports {backend_port}/{frontend_port} are in use, finding alternatives")
+            logger.warning(
+                f"Deterministic ports {backend_port}/{frontend_port} are in use, finding alternatives"
+            )
             backend_port, frontend_port = find_next_available_ports(adw_id)
-        
-        logger.info(f"Allocated ports - Backend: {backend_port}, Frontend: {frontend_port}")
+
+        logger.info(
+            f"Allocated ports - Backend: {backend_port}, Frontend: {frontend_port}"
+        )
         state.update(backend_port=backend_port, frontend_port=frontend_port)
         state.save("adw_plan_iso")
 
     # Fetch issue details
+    print("Fetch issue details")
+    logger.info(f"Fetching issue {issue_number}")
+    logger.info(f"Repo path: {repo_path}")
+
     issue: GitHubIssue = fetch_issue(issue_number, repo_path)
+
+    print(f"Issue fetched: {issue.model_dump_json(indent=2, by_alias=True)}")
 
     logger.debug(f"Fetched issue: {issue.model_dump_json(indent=2, by_alias=True)}")
     make_issue_comment(
-        issue_number, format_issue_message(adw_id, "ops", "✅ Starting isolated planning phase")
+        issue_number,
+        format_issue_message(adw_id, "ops", "✅ Starting isolated planning phase"),
     )
 
     make_issue_comment(
@@ -141,11 +172,14 @@ def main():
     # Classify the issue
     issue_command, error = classify_issue(issue, adw_id, logger)
 
-    if error:
-        logger.error(f"Error classifying issue: {error}")
+    if error or not issue_command:
+        error_msg = error or "No issue classification returned"
+        logger.error(f"Error classifying issue: {error_msg}")
         make_issue_comment(
             issue_number,
-            format_issue_message(adw_id, "ops", f"❌ Error classifying issue: {error}"),
+            format_issue_message(
+                adw_id, "ops", f"❌ Error classifying issue: {error_msg}"
+            ),
         )
         sys.exit(1)
 
@@ -160,12 +194,13 @@ def main():
     # Generate branch name
     branch_name, error = generate_branch_name(issue, issue_command, adw_id, logger)
 
-    if error:
-        logger.error(f"Error generating branch name: {error}")
+    if error or not branch_name:
+        error_msg = error or "No branch name generated"
+        logger.error(f"Error generating branch name: {error_msg}")
         make_issue_comment(
             issue_number,
             format_issue_message(
-                adw_id, "ops", f"❌ Error generating branch name: {error}"
+                adw_id, "ops", f"❌ Error generating branch name: {error_msg}"
             ),
         )
         sys.exit(1)
@@ -180,22 +215,26 @@ def main():
     if not valid:
         logger.info(f"Creating worktree for {adw_id}")
         worktree_path, error = create_worktree(adw_id, branch_name, logger)
-        
+
         if error:
             logger.error(f"Error creating worktree: {error}")
             make_issue_comment(
                 issue_number,
-                format_issue_message(adw_id, "ops", f"❌ Error creating worktree: {error}"),
+                format_issue_message(
+                    adw_id, "ops", f"❌ Error creating worktree: {error}"
+                ),
             )
             sys.exit(1)
-        
+
         state.update(worktree_path=worktree_path)
         state.save("adw_plan_iso")
         logger.info(f"Created worktree at {worktree_path}")
-        
+
         # Setup worktree environment (create .ports.env)
-        setup_worktree_environment(worktree_path, backend_port, frontend_port, logger)
-        
+        setup_worktree_environment(
+            worktree_path, int(backend_port), int(frontend_port), logger
+        )
+
         # Run install_worktree command to set up the isolated environment
         logger.info("Setting up isolated environment with custom ports")
         install_request = AgentTemplateRequest(
@@ -205,32 +244,46 @@ def main():
             adw_id=adw_id,
             working_dir=worktree_path,  # Execute in worktree
         )
-        
+
         install_response = execute_template(install_request)
         if not install_response.success:
             logger.error(f"Error setting up worktree: {install_response.output}")
             make_issue_comment(
                 issue_number,
-                format_issue_message(adw_id, "ops", f"❌ Error setting up worktree: {install_response.output}"),
+                format_issue_message(
+                    adw_id,
+                    "ops",
+                    f"❌ Error setting up worktree: {install_response.output}",
+                ),
             )
             sys.exit(1)
-        
+
         logger.info("Worktree environment setup complete")
 
     make_issue_comment(
         issue_number,
-        format_issue_message(adw_id, "ops", f"✅ Working in isolated worktree: {worktree_path}\n"
-                           f"🔌 Ports - Backend: {backend_port}, Frontend: {frontend_port}"),
+        format_issue_message(
+            adw_id,
+            "ops",
+            f"✅ Working in isolated worktree: {worktree_path}\n"
+            f"🔌 Ports - Backend: {backend_port}, Frontend: {frontend_port}",
+        ),
     )
 
     # Build the implementation plan (now executing in worktree)
     logger.info("Building implementation plan in worktree")
     make_issue_comment(
         issue_number,
-        format_issue_message(adw_id, AGENT_PLANNER, "✅ Building implementation plan in isolated environment"),
+        format_issue_message(
+            adw_id,
+            AGENT_PLANNER,
+            "✅ Building implementation plan in isolated environment",
+        ),
     )
 
-    plan_response = build_plan(issue, issue_command, adw_id, logger, working_dir=worktree_path)
+    plan_response = build_plan(
+        issue, issue_command, adw_id, logger, working_dir=worktree_path
+    )
 
     if not plan_response.success:
         logger.error(f"Error building plan: {plan_response.output}")
@@ -251,7 +304,7 @@ def main():
     # Get the plan file path directly from response
     logger.info("Getting plan file path")
     plan_file_path = plan_response.output.strip()
-    
+
     # Validate the path exists (within worktree)
     if not plan_file_path:
         error = "No plan file path returned from planning agent"
@@ -261,9 +314,9 @@ def main():
             format_issue_message(adw_id, "ops", f"❌ {error}"),
         )
         sys.exit(1)
-    
+
     # Check if file exists in worktree
-    worktree_plan_path = os.path.join(worktree_path, plan_file_path)
+    worktree_plan_path = os.path.join(str(worktree_path), plan_file_path)
     if not os.path.exists(worktree_plan_path):
         error = f"Plan file does not exist in worktree: {plan_file_path}"
         logger.error(error)
@@ -284,15 +337,16 @@ def main():
     # Create commit message
     logger.info("Creating plan commit")
     commit_msg, error = create_commit(
-        AGENT_PLANNER, issue, issue_command, adw_id, logger, worktree_path
+        AGENT_PLANNER, issue, issue_command, adw_id, logger, str(worktree_path)
     )
 
-    if error:
-        logger.error(f"Error creating commit message: {error}")
+    if error or not commit_msg:
+        error_msg = error or "No commit message generated"
+        logger.error(f"Error creating commit message: {error_msg}")
         make_issue_comment(
             issue_number,
             format_issue_message(
-                adw_id, AGENT_PLANNER, f"❌ Error creating commit message: {error}"
+                adw_id, AGENT_PLANNER, f"❌ Error creating commit message: {error_msg}"
             ),
         )
         sys.exit(1)
@@ -321,16 +375,17 @@ def main():
 
     logger.info("Isolated planning phase completed successfully")
     make_issue_comment(
-        issue_number, format_issue_message(adw_id, "ops", "✅ Isolated planning phase completed")
+        issue_number,
+        format_issue_message(adw_id, "ops", "✅ Isolated planning phase completed"),
     )
 
     # Save final state
     state.save("adw_plan_iso")
-    
+
     # Post final state summary to issue
     make_issue_comment(
         issue_number,
-        f"{adw_id}_ops: 📋 Final planning state:\n```json\n{json.dumps(state.data, indent=2)}\n```"
+        f"{adw_id}_ops: 📋 Final planning state:\n```json\n{json.dumps(state.data, indent=2)}\n```",
     )
 
 

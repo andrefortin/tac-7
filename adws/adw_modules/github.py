@@ -23,7 +23,7 @@ from .data_types import GitHubIssue, GitHubIssueListItem, GitHubComment
 # Bot identifier to prevent webhook loops and filter bot comments
 ADW_BOT_IDENTIFIER = "[ADW-AGENTS]"
 
-
+    
 def get_github_env() -> Optional[dict]:
     """Get environment with GitHub token set up. Returns None if no GITHUB_PAT.
     
@@ -92,14 +92,22 @@ def fetch_issue(issue_number: str, repo_path: str) -> GitHubIssue:
 
     # Set up environment with GitHub token if available
     env = get_github_env()
+    
+    print(f"GitHub env: {env}");
 
     try:
+        print(f"Running command: {' '.join(cmd)}")
         result = subprocess.run(cmd, capture_output=True, text=True, env=env)
 
+        print(f"Command output: {result}")
+        
         if result.returncode == 0:
             # Parse JSON response into Pydantic model
             issue_data = json.loads(result.stdout)
+            print(f"issue_data: {issue_data}")
+            
             issue = GitHubIssue(**issue_data)
+            print(f"issue: {issue}")
 
             return issue
         else:

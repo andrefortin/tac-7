@@ -306,7 +306,7 @@ def main():
     state = ADWState.load(adw_id, temp_logger)
     if state:
         # Found existing state - use the issue number from state if available
-        issue_number = state.get("issue_number", issue_number)
+        issue_number = str(state.get("issue_number", issue_number))
         make_issue_comment(
             issue_number,
             f"{adw_id}_ops: 🔍 Found existing state - starting isolated documentation\n```json\n{json.dumps(state.data, indent=2)}\n```",
@@ -352,6 +352,9 @@ def main():
 
     # Get worktree path for explicit context
     worktree_path = state.get("worktree_path")
+    if not worktree_path:
+        logger.error("No worktree path found in state")
+        sys.exit(1)
     logger.info(f"Using worktree at: {worktree_path}")
 
     # Get port information for display
@@ -451,20 +454,21 @@ def main():
     issue = fetch_issue(issue_number, repo_path)
 
     # Get issue classification from state
-    issue_command = state.get("issue_class", "/feature")
+    issue_command: IssueClassSlashCommand = state.get("issue_class", "/feature")
 
     # Create commit message
     logger.info("Creating documentation commit")
     commit_msg, error = create_commit(
-        AGENT_DOCUMENTER, issue, issue_command, adw_id, logger, worktree_path
+        AGENT_DOCUMENTER, issue, issue_command, adw_id, logger, str(worktree_path)
     )
 
-    if error:
-        logger.error(f"Error creating commit message: {error}")
+    if error or not commit_msg:
+        error_msg = error or "No commit message generated"
+        logger.error(f"Error creating commit message: {error_msg}")
         make_issue_comment(
             issue_number,
             format_issue_message(
-                adw_id, AGENT_DOCUMENTER, f"❌ Error creating commit message: {error}"
+                adw_id, AGENT_DOCUMENTER, f"❌ Error creating commit message: {error_msg}"
             ),
         )
         sys.exit(1)

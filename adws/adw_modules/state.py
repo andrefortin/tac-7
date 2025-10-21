@@ -120,7 +120,7 @@ class ADWState:
             state_data = ADWStateData(**data)
 
             # Create ADWState instance
-            state = cls(state_data.adw_id)
+            state = cls(str(state_data.adw_id))
             state.data = state_data.model_dump()
 
             if logger:

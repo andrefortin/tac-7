@@ -8,7 +8,7 @@ from enum import Enum
 
 # Retry codes for Claude Code execution errors
 class RetryCode(str, Enum):
-    """Codes indicating different types of errors that may be retryable."""
+    """Codes indicating different types of errors that may be tried again."""
 
     CLAUDE_CODE_ERROR = "claude_code_error"  # General Claude Code CLI error
     TIMEOUT_ERROR = "timeout_error"  # Command timed out
@@ -33,13 +33,13 @@ ADWWorkflow = Literal[
     "adw_review_iso",  # Review only (dependent workflow)
     "adw_document_iso",  # Documentation only (dependent workflow)
     "adw_ship_iso",  # Ship/deployment workflow
-    "adw_sdlc_ZTE_iso",  # Zero Touch Execution - full SDLC with auto-merge
+    "adw_sdlc_ZTE_iso",  # Zero Touch Execution - full lifecycle with auto-merge
     "adw_plan_build_iso",  # Plan + Build
     "adw_plan_build_test_iso",  # Plan + Build + Test
     "adw_plan_build_test_review_iso",  # Plan + Build + Test + Review
     "adw_plan_build_document_iso",  # Plan + Build + Document
     "adw_plan_build_review_iso",  # Plan + Build + Review
-    "adw_sdlc_iso",  # Complete SDLC: Plan + Build + Test + Review + Document
+    "adw_sdlc_iso",  # Complete lifecycle: Plan + Build + Test + Review + Document
 ]
 
 # All slash commands used in the ADW system
@@ -63,7 +63,7 @@ SlashCommand = Literal[
     "/review",
     "/patch",
     "/document",
-    "/track_agentic_kpis",
+    "/track_agent_kpis",
     # Installation/setup commands
     "/install_worktree",
 ]
@@ -179,7 +179,7 @@ class AgentTemplateRequest(BaseModel):
 class ClaudeCodeResultMessage(BaseModel):
     """Claude Code JSONL result message (last line)."""
 
-    type: str
+    type: Optional[str] = None
     subtype: str
     is_error: bool
     duration_ms: int

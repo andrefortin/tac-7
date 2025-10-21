@@ -10,6 +10,7 @@ from typing import Optional, Tuple
 
 # Import GitHub functions from existing module
 from adw_modules.github import get_repo_url, extract_repo_path, make_issue_comment
+from adw_modules.state import ADWState
 
 
 def get_current_branch(cwd: Optional[str] = None) -> str:
@@ -250,7 +251,7 @@ def merge_pr(
 
 
 def finalize_git_operations(
-    state: "ADWState", logger: logging.Logger, cwd: Optional[str] = None
+    state: ADWState, logger: logging.Logger, cwd: Optional[str] = None
 ) -> None:
     """Standard git finalization: push branch and create/update PR."""
     branch_name = state.get("branch_name")
@@ -298,7 +299,7 @@ def finalize_git_operations(
 
                 from adw_modules.workflow_ops import create_pull_request
 
-                pr_url, error = create_pull_request(branch_name, issue, state, logger, cwd)
+                pr_url, error = create_pull_request(branch_name, issue, state, logger, cwd or ".")
             except Exception as e:
                 logger.error(f"Failed to fetch issue for PR creation: {e}")
                 pr_url, error = None, str(e)
