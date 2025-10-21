@@ -6,7 +6,7 @@
     },
     "contextOptions": {
       "recordVideo": {
-        "dir": "./videos",
+        "dir": "/home/andre/batcave/tac-7/trees/fe319214/videos",
         "size": {
           "width": 1920,
           "height": 1080
