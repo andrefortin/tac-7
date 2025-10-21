@@ -147,9 +147,7 @@ def truncate_output(
 def check_claude_installed() -> Optional[str]:
     """Check if Claude Code CLI is installed. Return error message if not."""
     try:
-        result = subprocess.run(
-            [CLAUDE_PATH, "-v"], capture_output=True, text=True
-        )
+        result = subprocess.run([CLAUDE_PATH, "-v"], capture_output=True, text=True)
         if result.returncode != 0:
             return (
                 f"Error: Claude Code CLI is not installed. Expected at: {CLAUDE_PATH}"
@@ -323,11 +321,11 @@ def prompt_claude_code(request: AgentPromptRequest) -> AgentPromptResponse:
         os.makedirs(output_dir, exist_ok=True)
 
     # Build command - always use stream-json format and verbose
-    cmd = [CLAUDE_PATH, "code" "-p", request.prompt]
+    cmd = [CLAUDE_PATH, "code","-p", request.prompt]
     cmd.extend(["--model", request.model])
     cmd.extend(["--output-format", "stream-json"])
     cmd.append("--verbose")
-    
+
     # Check for MCP config in working directory
     if request.working_dir:
         mcp_config_path = os.path.join(request.working_dir, ".mcp.json")
