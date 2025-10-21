@@ -41,7 +41,6 @@ cp .env.sample .env
 # Edit .env and add your API keys
 ```
 
-
 ```bash
 cd app/server
 cp .env.sample .env
@@ -59,6 +58,7 @@ Use the provided script to start both services:
 Press `Ctrl+C` to stop both services.
 
 The script will:
+
 - Check that `.env` exists in `app/server/`
 - Start the backend on http://localhost:8000
 - Start the frontend on http://localhost:5173
@@ -67,6 +67,7 @@ The script will:
 ## Manual Start (Alternative)
 
 ### Backend
+
 ```bash
 cd app/server
 # .env is loaded automatically by python-dotenv
@@ -74,6 +75,7 @@ uv run python server.py
 ```
 
 ### Frontend
+
 ```bash
 cd app/client
 bun run dev
@@ -93,6 +95,7 @@ bun run dev
 ## Development
 
 ### Backend Commands
+
 ```bash
 cd app/server
 uv run python server.py      # Start server with hot reload
@@ -103,6 +106,7 @@ uv sync --all-extras        # Sync all extras
 ```
 
 ### Frontend Commands
+
 ```bash
 cd app/client
 bun run dev                 # Start dev server
@@ -112,7 +116,7 @@ bun run preview            # Preview production build
 
 ## Project Structure
 
-```
+```text
 .
 ├── app/                    # Main application
 │   ├── client/             # Vite + TypeScript frontend
@@ -141,18 +145,21 @@ bun run preview            # Preview production build
 The application implements comprehensive SQL injection protection through multiple layers:
 
 1. **Centralized Security Module** (`core/sql_security.py`):
+
    - Identifier validation for table and column names
    - Safe query execution with parameterized queries
    - Proper escaping for identifiers using SQLite's square bracket notation
    - Dangerous operation detection and blocking
 
 2. **Input Validation**:
+
    - All table and column names are validated against a whitelist pattern
    - SQL keywords cannot be used as identifiers
    - File names are sanitized before creating tables
    - User queries are validated for dangerous operations
 
 3. **Query Execution Safety**:
+
    - Parameterized queries used wherever possible
    - Identifiers (table/column names) are properly escaped
    - Multiple statement execution is blocked
@@ -167,6 +174,7 @@ The application implements comprehensive SQL injection protection through multip
 ### Security Best Practices for Development
 
 When adding new SQL functionality:
+
 1. Always use the `sql_security` module functions
 2. Never concatenate user input directly into SQL strings
 3. Use `execute_query_safely()` for all database operations
@@ -176,11 +184,11 @@ When adding new SQL functionality:
 ### Testing Security
 
 Run the comprehensive security tests:
+
 ```bash
 cd app/server
 uv run pytest tests/test_sql_injection.py -v
 ```
-
 
 ### Additional Security Features
 
@@ -218,21 +226,27 @@ export GITHUB_PAT="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  # Optional, only i
 ADW supports three main operation modes:
 
 #### 1. Manual Processing
+
 Process a single GitHub issue manually (in isolated worktree):
+
 ```bash
 cd adws/
 uv run adw_plan_build_iso.py <issue-number>
 ```
 
 #### 2. Automated Monitoring
+
 Continuously monitor GitHub for new issues (polls every 20 seconds):
+
 ```bash
 cd adws/
 uv run trigger_cron.py
 ```
 
 #### 3. Webhook Server
+
 Start a webhook server for real-time GitHub event processing:
+
 ```bash
 cd adws/
 uv run trigger_webhook.py
@@ -252,13 +266,16 @@ For detailed technical documentation, configuration options, and troubleshooting
 ## Troubleshooting
 
 **Backend won't start:**
+
 - Check Python version: `python --version` (requires 3.12+)
 - Verify API keys are set: `echo $OPENAI_API_KEY`
 
 **Frontend errors:**
+
 - Clear node_modules: `rm -rf node_modules && bun install`
 - Check Node version: `node --version` (requires 18+)
 
 **CORS issues:**
+
 - Ensure backend is running on port 8000
 - Check vite.config.ts proxy settings

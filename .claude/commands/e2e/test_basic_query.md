@@ -14,6 +14,7 @@ So that I can access information without writing SQL
 2. Take a screenshot of the initial state
 3. **Verify** the page title is "Natural Language SQL Interface"
 4. **Verify** core UI elements are present:
+
    - Query input textbox
    - Query button
    - Upload Data button
@@ -23,13 +24,14 @@ So that I can access information without writing SQL
 6. Take a screenshot of the query input
 7. Click the Query button
 8. **Verify** the query results appear
-9. **Verify** the SQL translation is displayed (should contain "SELECT * FROM users")
+9. **Verify** the SQL translation is displayed (should contain "SELECT \* FROM users")
 10. Take a screenshot of the SQL translation
 11. **Verify** the results table contains data
 12. Take a screenshot of the results
 13. Click "Hide" button to close results
 
 ## Success Criteria
+
 - Query input accepts text
 - Query button triggers execution
 - Results display correctly

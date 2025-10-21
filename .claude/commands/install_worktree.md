@@ -3,11 +3,13 @@
 This command sets up an isolated worktree environment with custom port configuration.
 
 ## Parameters
+
 - Worktree path: {0}
 - Backend port: {1}
 - Frontend port: {2}
 
 ## Read
+
 - .env.sample (from parent repo)
 - ./app/server/.env.sample (from parent repo)
 - .mcp.json (from parent repo)
@@ -16,12 +18,14 @@ This command sets up an isolated worktree environment with custom port configura
 ## Steps
 
 1. **Navigate to worktree directory**
+
    ```bash
    cd {0}
    ```
 
 2. **Create port configuration file**
    Create `.ports.env` with:
+
    ```
    BACKEND_PORT={1}
    FRONTEND_PORT={2}
@@ -29,17 +33,20 @@ This command sets up an isolated worktree environment with custom port configura
    ```
 
 3. **Copy and update .env files**
+
    - Copy `.env` from parent repo if it exists
    - Append `.ports.env` contents to `.env`
    - Copy `app/server/.env` from parent repo if it exists
    - Append `.ports.env` contents to `app/server/.env`
 
 4. **Copy and configure MCP files**
+
    - Copy `.mcp.json` from parent repo if it exists
    - Copy `playwright-mcp-config.json` from parent repo if it exists
    - These files are needed for Model Context Protocol and Playwright automation
-   
+
    After copying, update paths to use absolute paths:
+
    - Get the absolute worktree path: `WORKTREE_PATH=$(pwd)`
    - Update `.mcp.json`:
      - Find the line containing `"./playwright-mcp-config.json"`
@@ -52,11 +59,13 @@ This command sets up an isolated worktree environment with custom port configura
    - This ensures MCP configuration works correctly regardless of execution context
 
 5. **Install backend dependencies**
+
    ```bash
    cd app/server && uv sync --all-extras
    ```
 
 6. **Install frontend dependencies**
+
    ```bash
    cd ../client && bun install
    ```
@@ -67,10 +76,12 @@ This command sets up an isolated worktree environment with custom port configura
    ```
 
 ## Error Handling
+
 - If parent .env files don't exist, create minimal versions from .env.sample files
 - Ensure all paths are absolute to avoid confusion
 
 ## Report
+
 - List all files created/modified (including MCP configuration files)
 - Show port assignments
 - Confirm dependencies installed

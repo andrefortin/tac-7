@@ -30,6 +30,7 @@ issue_screenshots: $5 (optional) - comma-separated list of screenshot paths if p
 ## Relevant Files
 
 Focus on the following files:
+
 - `README.md` - Contains the project overview and instructions.
 - `app/server/**` - Contains the codebase server.
 - `app/client/**` - Contains the codebase client.
@@ -41,47 +42,54 @@ Focus on the following files:
 
 Ignore all other files in the codebase.
 
-
 ## Plan Format
 
 ```md
 # Patch: <concise patch title>
 
 ## Metadata
+
 adw_id: `{adw_id}`
 review_change_request: `{review_change_request}`
 
 ## Issue Summary
+
 **Original Spec:** <spec_path>
 **Issue:** <brief description of the review issue based on the `review_change_request`>
 **Solution:** <brief description of the solution approach based on the `review_change_request`>
 
 ## Files to Modify
+
 Use these files to implement the patch:
 
 <list only the files that need changes - be specific and minimal>
 
 ## Implementation Steps
+
 IMPORTANT: Execute every step in order, top to bottom.
 
 <list 2-5 focused steps to implement the patch. Each step should be a concrete action.>
 
 ### Step 1: <specific action>
+
 - <implementation detail>
 - <implementation detail>
 
 ### Step 2: <specific action>
+
 - <implementation detail>
 - <implementation detail>
 
 <continue as needed, but keep it minimal>
 
 ## Validation
+
 Execute every command to validate the patch is complete with zero regressions.
 
 <list 1-5 specific commands or checks to verify the patch works correctly>
 
 ## Patch Scope
+
 **Lines of code to change:** <estimate>
 **Risk level:** <low|medium|high>
 **Testing required:** <brief description>

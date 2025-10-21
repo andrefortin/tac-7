@@ -14,6 +14,7 @@ So that I can analyze data in external tools and share results with colleagues
 2. Take a screenshot of the initial state
 3. **Verify** the page title is "Natural Language SQL Interface"
 4. **Verify** core UI elements are present:
+
    - Query input textbox
    - Query button
    - Upload Data button
@@ -28,7 +29,7 @@ So that I can analyze data in external tools and share results with colleagues
 10. **Verify** a CSV file is downloaded with the table name
 11. **Verify** the downloaded file contains the table data
 
-12. Enter a query: "SELECT * FROM uploaded_table LIMIT 5"
+12. Enter a query: "SELECT \* FROM uploaded_table LIMIT 5"
 13. Click the Query button
 14. **Verify** the query results appear
 15. **Verify** a download button appears to the left of the 'Hide' button
@@ -38,7 +39,7 @@ So that I can analyze data in external tools and share results with colleagues
 18. **Verify** a CSV file is downloaded named "query_results.csv"
 19. **Verify** the downloaded file contains the query results data
 
-20. Execute an empty result query: "SELECT * FROM uploaded_table WHERE 1=0"
+20. Execute an empty result query: "SELECT \* FROM uploaded_table WHERE 1=0"
 21. **Verify** the download button is still present
 22. Click the download button
 23. **Verify** an empty CSV with headers is downloaded
@@ -46,6 +47,7 @@ So that I can analyze data in external tools and share results with colleagues
 24. Take a screenshot of the final state
 
 ## Success Criteria
+
 - Download buttons appear in correct positions (left of 'x' for tables, left of 'Hide' for results)
 - Table export downloads complete table as CSV
 - Query export downloads current results as CSV

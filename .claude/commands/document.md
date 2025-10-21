@@ -11,11 +11,13 @@ documentation_screenshots_dir: $3 if provided, otherwise leave it blank
 ## Instructions
 
 ### 1. Analyze Changes
+
 - Run `git diff origin/main --stat` to see files changed and lines modified
 - Run `git diff origin/main --name-only` to get the list of changed files
 - For significant changes (>50 lines), run `git diff origin/main <file>` on specific files to understand the implementation details
 
 ### 2. Read Specification (if provided)
+
 - If `spec_path` is provided, read the specification file to understand:
   - Original requirements and goals
   - Expected functionality
@@ -23,15 +25,17 @@ documentation_screenshots_dir: $3 if provided, otherwise leave it blank
 - Use this to frame the documentation around what was requested vs what was built
 
 ### 3. Analyze and Copy Screenshots (if provided)
+
 - If `documentation_screenshots_dir` is provided, list and examine screenshots
 - Create `app_docs/assets/` directory if it doesn't exist
-- Copy all screenshot files (*.png) from `documentation_screenshots_dir` to `app_docs/assets/`
+- Copy all screenshot files (\*.png) from `documentation_screenshots_dir` to `app_docs/assets/`
   - Preserve original filenames
   - Use `cp` command to copy files
 - Use visual context to better describe UI changes or visual features
 - Reference screenshots in documentation using relative paths (e.g., `assets/screenshot-name.png`)
 
 ### 4. Generate Documentation
+
 - Create a new documentation file in `app_docs/` directory
 - Filename format: `feature-{adw_id}-{descriptive-name}.md`
   - Replace `{descriptive-name}` with a short feature name (e.g., "user-auth", "data-export", "search-ui")
@@ -43,12 +47,14 @@ documentation_screenshots_dir: $3 if provided, otherwise leave it blank
   - Any configuration or setup required
 
 ### 5. Update Conditional Documentation
+
 - After creating the documentation file, read `.claude/commands/conditional_docs.md`
 - Add an entry for the new documentation file with appropriate conditions
 - The entry should help future developers know when to read this documentation
 - Format the entry following the existing pattern in the file
 
 ### 6. Final Output
+
 - When you finish writing the documentation and updating conditional_docs.md, return exclusively the path to the documentation file created and nothing else
 
 ## Documentation Format

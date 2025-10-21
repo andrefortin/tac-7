@@ -22,6 +22,7 @@ So that my data remains secure and the database integrity is maintained
 10. Take a screenshot showing the tables are intact
 
 ## Success Criteria
+
 - SQL injection attempt is blocked
 - Appropriate security error message is displayed
 - No damage to the database

@@ -5,8 +5,9 @@ Execute comprehensive validation tests for both frontend and backend components,
 ## Purpose
 
 Proactively identify and fix issues in the application before they impact users or developers. By running this comprehensive test suite, you can:
+
 - Detect syntax errors, type mismatches, and import failures
-- Identify broken tests or security vulnerabilities  
+- Identify broken tests or security vulnerabilities
 - Verify build processes and dependencies
 - Ensure the application is in a healthy state
 
@@ -40,12 +41,14 @@ TEST_COMMAND_TIMEOUT: 5 minutes
 ### Backend Tests
 
 1. **Python Syntax Check**
+
    - Preparation Command: None
    - Command: `cd app/server && uv run python -m py_compile server.py main.py core/*.py`
    - test_name: "python_syntax_check"
    - test_purpose: "Validates Python syntax by compiling source files to bytecode, catching syntax errors like missing colons, invalid indentation, or malformed statements"
 
 2. **Backend Code Quality Check**
+
    - Preparation Command: None
    - Command: `cd app/server && uv run ruff check .`
    - test_name: "backend_linting"
@@ -60,6 +63,7 @@ TEST_COMMAND_TIMEOUT: 5 minutes
 ### Frontend Tests
 
 4. **TypeScript Type Check**
+
    - Preparation Command: None
    - Command: `cd app/client && bun tsc --noEmit`
    - test_name: "typescript_check"

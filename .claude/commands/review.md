@@ -1,6 +1,6 @@
 # Review
 
-Follow the `Instructions` below to **review work done against a specification file** (specs/*.md) to ensure implemented features match requirements. Use the spec file to understand the requirements and then use the git diff if available to understand the changes made. Capture screenshots of critical functionality paths as documented in the `Instructions` section. If there are issues, report them if not then report success.
+Follow the `Instructions` below to **review work done against a specification file** (specs/\*.md) to ensure implemented features match requirements. Use the spec file to understand the requirements and then use the git diff if available to understand the changes made. Capture screenshots of critical functionality paths as documented in the `Instructions` section. If there are issues, report them if not then report success.
 
 ## Variables
 
@@ -13,11 +13,11 @@ review_image_dir: `<absolute path to codebase>/agents/<adw_id>/<agent_name>/revi
 
 - Check current git branch using `git branch` to understand context
 - Run `git diff origin/main` to see all changes made in current branch. Continue even if there are no changes related to the spec file.
-- Find the spec file by looking for specs/*.md files in the diff that match the current branch name
+- Find the spec file by looking for specs/\*.md files in the diff that match the current branch name
 - Read the identified spec file to understand requirements
 - IMPORTANT: If the work can be validated by UI validation then (if not skip the section):
   - Use the playwright mcp server commands to validate the work.
-  - Look for corresponding e2e test files in ./claude/commands/e2e/test_*.md that mirror the feature name
+  - Look for corresponding e2e test files in ./claude/commands/e2e/test\_\*.md that mirror the feature name
   - Use e2e test files only as navigation guides for screenshot locations, not for other purposes
   - IMPORTANT: To be clear, we're not testing. We know the functionality works. We're reviewing the implementation against the spec to make sure it matches what was requested.
   - IMPORTANT: Take screen shots along the way to showcase the new functionality and any issues you find
@@ -49,6 +49,7 @@ review_image_dir: `<absolute path to codebase>/agents/<adw_id>/<agent_name>/revi
 ## Setup
 
 IMPORTANT: Read and **Execute** `.claude/commands/prepare_app.md` now to prepare the application for the review.
+
 - Note: prepare_app.md will automatically detect and use ports from `.ports.env` if running in a worktree environment
 - The application URL will be http://localhost:PORT where PORT is from `.ports.env` (FRONTEND_PORT) or default 5173
 
@@ -83,3 +84,4 @@ IMPORTANT: Read and **Execute** `.claude/commands/prepare_app.md` now to prepare
         "...",
     ]
 }
+```

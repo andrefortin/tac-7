@@ -25,6 +25,7 @@ So that I can retrieve specific subsets of data without needing to write SQL
 13. Take a screenshot of the final state
 
 ## Success Criteria
+
 - Complex natural language is correctly interpreted
 - SQL contains appropriate WHERE conditions
 - Results are properly filtered

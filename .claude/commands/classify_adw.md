@@ -35,6 +35,7 @@ Extract ADW workflow information from the text below and return a JSON response.
 ## Response Format
 
 Respond ONLY with a JSON object in this format:
+
 ```json
 {
   "adw_slash_command": "/adw_plan",
@@ -44,6 +45,7 @@ Respond ONLY with a JSON object in this format:
 ```
 
 Fields:
+
 - `adw_slash_command`: The ADW command found (include the slash)
 - `adw_id`: The 8-character ADW ID if found
 - `model_set`: The model set to use ("base" or "heavy"), defaults to "base" if not specified

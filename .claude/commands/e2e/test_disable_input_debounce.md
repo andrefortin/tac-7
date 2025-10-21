@@ -38,6 +38,7 @@ So that I don't accidentally type or submit multiple queries at once
 19. Take a screenshot of the re-enabled state with results
 
 20. Test debouncing:
+
     - Enter a new query: "Count all users"
     - Rapidly click the Query button 5 times within 1 second
     - **Verify** only one query is executed (results should update once, not multiple times)
@@ -50,6 +51,7 @@ So that I don't accidentally type or submit multiple queries at once
     - **Verify** the input is re-enabled after completion
 
 ## Success Criteria
+
 - Query input is disabled during query execution
 - Query button is disabled during query execution
 - User cannot type in the textarea while a query is processing

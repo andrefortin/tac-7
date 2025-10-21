@@ -5,14 +5,18 @@ ADW automates software development using isolated git worktrees. The `_iso` suff
 ## Key Concepts
 
 ### Isolated Execution
+
 Every ADW workflow runs in an isolated git worktree under `trees/<adw_id>/` with:
+
 - Complete filesystem isolation
 - Dedicated port ranges (backend: 9100-9114, frontend: 9200-9214)
 - Independent git branches
 - Support for 15 concurrent instances
 
 ### ADW ID
+
 Each workflow run is assigned a unique 8-character identifier (e.g., `a1b2c3d4`). This ID:
+
 - Tracks all phases of a workflow (plan → build → test → review → document)
 - Appears in GitHub comments, commits, and PR titles
 - Creates an isolated worktree at `trees/{adw_id}/`
@@ -20,7 +24,9 @@ Each workflow run is assigned a unique 8-character identifier (e.g., `a1b2c3d4`)
 - Enables resuming workflows and debugging
 
 ### State Management
+
 ADW uses persistent state files (`agents/{adw_id}/adw_state.json`) to:
+
 - Share data between workflow phases
 - Track worktree locations and port assignments
 - Enable workflow composition and chaining
@@ -111,14 +117,17 @@ uv run adw_triggers/trigger_webhook.py
 ### Entry Point Workflows (Create Worktrees)
 
 #### adw_plan_iso.py - Isolated Planning
+
 Creates isolated worktree and generates implementation plans.
 
 **Usage:**
+
 ```bash
 uv run adw_plan_iso.py <issue-number> [adw-id]
 ```
 
 **What it does:**
+
 1. Creates isolated git worktree at `trees/<adw_id>/`
 2. Allocates unique ports (backend: 9100-9114, frontend: 9200-9214)
 3. Sets up environment with `.ports.env`
@@ -129,14 +138,17 @@ uv run adw_plan_iso.py <issue-number> [adw-id]
 8. Creates/updates pull request
 
 #### adw_patch_iso.py - Isolated Patch Workflow
+
 Quick patches in isolated environment triggered by 'adw_patch' keyword.
 
 **Usage:**
+
 ```bash
 uv run adw_patch_iso.py <issue-number> [adw-id]
 ```
 
 **What it does:**
+
 1. Searches for 'adw_patch' in issue/comments
 2. Creates isolated worktree with unique ports
 3. Creates targeted patch plan in isolation
@@ -146,18 +158,22 @@ uv run adw_patch_iso.py <issue-number> [adw-id]
 ### Dependent Workflows (Require Existing Worktree)
 
 #### adw_build_iso.py - Isolated Implementation
+
 Implements solutions in existing isolated environment.
 
 **Requirements:**
+
 - Existing worktree created by `adw_plan_iso.py` or `adw_patch_iso.py`
 - ADW ID is mandatory
 
 **Usage:**
+
 ```bash
 uv run adw_build_iso.py <issue-number> <adw-id>
 ```
 
 **What it does:**
+
 1. Validates worktree exists
 2. Switches to correct branch if needed
 3. Locates plan file in worktree
@@ -165,18 +181,22 @@ uv run adw_build_iso.py <issue-number> <adw-id>
 5. Commits and pushes from worktree
 
 #### adw_test_iso.py - Isolated Testing
+
 Runs tests in isolated environment.
 
 **Requirements:**
+
 - Existing worktree
 - ADW ID is mandatory
 
 **Usage:**
+
 ```bash
 uv run adw_test_iso.py <issue-number> <adw-id> [--skip-e2e]
 ```
 
 **What it does:**
+
 1. Validates worktree exists
 2. Runs tests with allocated ports
 3. Auto-resolves failures in isolation
@@ -184,18 +204,22 @@ uv run adw_test_iso.py <issue-number> <adw-id> [--skip-e2e]
 5. Commits results from worktree
 
 #### adw_review_iso.py - Isolated Review
+
 Reviews implementation in isolated environment.
 
 **Requirements:**
+
 - Existing worktree
 - ADW ID is mandatory
 
 **Usage:**
+
 ```bash
 uv run adw_review_iso.py <issue-number> <adw-id> [--skip-resolution]
 ```
 
 **What it does:**
+
 1. Validates worktree exists
 2. Reviews against spec in isolation
 3. Captures screenshots using allocated ports
@@ -203,18 +227,22 @@ uv run adw_review_iso.py <issue-number> <adw-id> [--skip-resolution]
 5. Uploads screenshots and commits
 
 #### adw_document_iso.py - Isolated Documentation
+
 Generates documentation in isolated environment.
 
 **Requirements:**
+
 - Existing worktree
 - ADW ID is mandatory
 
 **Usage:**
+
 ```bash
 uv run adw_document_iso.py <issue-number> <adw-id>
 ```
 
 **What it does:**
+
 1. Validates worktree exists
 2. Analyzes changes in worktree
 3. Generates documentation in isolation
@@ -223,54 +251,67 @@ uv run adw_document_iso.py <issue-number> <adw-id>
 ### Orchestrator Scripts
 
 #### adw_plan_build_iso.py - Isolated Plan + Build
+
 Runs planning and building in isolation.
 
 **Usage:**
+
 ```bash
 uv run adw_plan_build_iso.py <issue-number> [adw-id]
 ```
 
 #### adw_plan_build_test_iso.py - Isolated Plan + Build + Test
+
 Full pipeline with testing in isolation.
 
 **Usage:**
+
 ```bash
 uv run adw_plan_build_test_iso.py <issue-number> [adw-id]
 ```
 
 #### adw_plan_build_test_review_iso.py - Isolated Plan + Build + Test + Review
+
 Complete pipeline with review in isolation.
 
 **Usage:**
+
 ```bash
 uv run adw_plan_build_test_review_iso.py <issue-number> [adw-id]
 ```
 
 #### adw_plan_build_review_iso.py - Isolated Plan + Build + Review
+
 Pipeline with review, skipping tests.
 
 **Usage:**
+
 ```bash
 uv run adw_plan_build_review_iso.py <issue-number> [adw-id]
 ```
 
 #### adw_plan_build_document_iso.py - Isolated Plan + Build + Document
+
 Documentation pipeline in isolation.
 
 **Usage:**
+
 ```bash
 uv run adw_plan_build_document_iso.py <issue-number> [adw-id]
 ```
 
 #### adw_sdlc_iso.py - Complete Isolated SDLC
+
 Full Software Development Life Cycle in isolation.
 
 **Usage:**
+
 ```bash
 uv run adw_sdlc_iso.py <issue-number> [adw-id] [--skip-e2e] [--skip-resolution]
 ```
 
 **Phases:**
+
 1. **Plan**: Creates worktree and implementation spec
 2. **Build**: Implements solution in isolation
 3. **Test**: Runs tests with dedicated ports
@@ -278,6 +319,7 @@ uv run adw_sdlc_iso.py <issue-number> [adw-id] [--skip-e2e] [--skip-resolution]
 5. **Document**: Generates comprehensive docs
 
 **Output:**
+
 - Isolated worktree at `trees/<adw_id>/`
 - Feature implementation on dedicated branch
 - Test results with port isolation
@@ -285,19 +327,23 @@ uv run adw_sdlc_iso.py <issue-number> [adw-id] [--skip-e2e] [--skip-resolution]
 - Complete documentation in `app_docs/`
 
 #### adw_ship_iso.py - Approve and Merge PR
+
 Final shipping phase that validates state and merges to main.
 
 **Requirements:**
+
 - Complete ADWState with all fields populated
 - Existing worktree and PR
 - ADW ID is mandatory
 
 **Usage:**
+
 ```bash
 uv run adw_ship_iso.py <issue-number> <adw-id>
 ```
 
 **What it does:**
+
 1. Validates all ADWState fields have values
 2. Verifies worktree exists
 3. Finds PR for the branch
@@ -305,6 +351,7 @@ uv run adw_ship_iso.py <issue-number> <adw-id>
 5. Merges PR to main using squash method
 
 **State validation ensures:**
+
 - `adw_id` is set
 - `issue_number` is set
 - `branch_name` exists
@@ -314,14 +361,17 @@ uv run adw_ship_iso.py <issue-number> <adw-id>
 - `backend_port` and `frontend_port` allocated
 
 #### adw_sdlc_zte_iso.py - Zero Touch Execution
+
 Complete SDLC with automatic shipping - no human intervention required.
 
 **Usage:**
+
 ```bash
 uv run adw_sdlc_zte_iso.py <issue-number> [adw-id] [--skip-e2e] [--skip-resolution]
 ```
 
 **Phases:**
+
 1. **Plan**: Creates worktree and implementation spec
 2. **Build**: Implements solution in isolation
 3. **Test**: Runs tests (stops on failure)
@@ -332,6 +382,7 @@ uv run adw_sdlc_zte_iso.py <issue-number> [adw-id] [--skip-e2e] [--skip-resoluti
 **⚠️ WARNING:** This workflow will automatically merge code to main if all phases pass!
 
 **Output:**
+
 - Complete feature implementation
 - Automatic PR approval
 - Code merged to main branch
@@ -340,31 +391,38 @@ uv run adw_sdlc_zte_iso.py <issue-number> [adw-id] [--skip-e2e] [--skip-resoluti
 ### Automation Triggers
 
 #### trigger_cron.py - Polling Monitor
+
 Continuously monitors GitHub for triggers.
 
 **Usage:**
+
 ```bash
 uv run adw_triggers/trigger_cron.py
 ```
 
 **Triggers on:**
+
 - New issues with no comments
 - Any issue where latest comment is exactly "adw"
 - Polls every 20 seconds
 
 **Workflow selection:**
+
 - Uses `adw_plan_build_iso.py` by default
 - Supports all isolated workflows via issue body keywords
 
 #### trigger_webhook.py - Real-time Events
+
 Webhook server for instant GitHub event processing.
 
 **Usage:**
+
 ```bash
 uv run adw_triggers/trigger_webhook.py
 ```
 
 **Configuration:**
+
 - Default port: 8001
 - Endpoints:
   - `/gh-webhook` - GitHub event receiver
@@ -375,23 +433,27 @@ uv run adw_triggers/trigger_webhook.py
   - Events: Issues, Issue comments
 
 **Security:**
+
 - Validates GitHub webhook signatures
 - Requires `GITHUB_WEBHOOK_SECRET` environment variable
 
 ## How ADW Works
 
 1. **Issue Classification**: Analyzes GitHub issue and determines type:
+
    - `/chore` - Maintenance, documentation, refactoring
    - `/bug` - Bug fixes and corrections
    - `/feature` - New features and enhancements
 
 2. **Planning**: `sdlc_planner` agent creates implementation plan with:
+
    - Technical approach
    - Step-by-step tasks
    - File modifications
    - Testing requirements
 
 3. **Implementation**: `sdlc_implementor` agent executes the plan:
+
    - Analyzes codebase
    - Implements changes
    - Runs tests
@@ -405,6 +467,7 @@ uv run adw_triggers/trigger_webhook.py
 ## Common Usage Scenarios
 
 ### Process a bug report in isolation
+
 ```bash
 # User reports bug in issue #789
 uv run adw_plan_build_iso.py 789
@@ -412,6 +475,7 @@ uv run adw_plan_build_iso.py 789
 ```
 
 ### Run multiple workflows concurrently
+
 ```bash
 # Process three issues in parallel
 uv run adw_plan_build_iso.py 101 &
@@ -421,6 +485,7 @@ uv run adw_plan_build_iso.py 103 &
 ```
 
 ### Run complete SDLC in isolation
+
 ```bash
 # Full SDLC with review and documentation
 uv run adw_sdlc_iso.py 789
@@ -430,6 +495,7 @@ uv run adw_sdlc_iso.py 789
 ```
 
 ### Zero Touch Execution (Auto-ship)
+
 ```bash
 # Complete SDLC with automatic PR merge
 uv run adw_sdlc_zte_iso.py 789
@@ -438,6 +504,7 @@ uv run adw_sdlc_zte_iso.py 789
 ```
 
 ### Manual shipping workflow
+
 ```bash
 # After running SDLC, manually approve and merge
 uv run adw_ship_iso.py 789 abc12345
@@ -447,6 +514,7 @@ uv run adw_ship_iso.py 789 abc12345
 ```
 
 ### Run individual phases
+
 ```bash
 # Plan only (creates worktree)
 uv run adw_plan_iso.py 789
@@ -462,6 +530,7 @@ uv run adw_ship_iso.py 789 abc12345
 ```
 
 ### Enable automatic processing
+
 ```bash
 # Start cron monitoring
 uv run adw_triggers/trigger_cron.py
@@ -470,6 +539,7 @@ uv run adw_triggers/trigger_cron.py
 ```
 
 ### Deploy webhook for instant response
+
 ```bash
 # Start webhook server
 uv run adw_triggers/trigger_webhook.py
@@ -482,6 +552,7 @@ uv run adw_triggers/trigger_webhook.py
 Include the workflow name in your issue body to trigger a specific isolated workflow:
 
 **Available Workflows:**
+
 - `adw_plan_iso` - Isolated planning only
 - `adw_patch_iso` - Quick patch in isolation
 - `adw_plan_build_iso` - Plan and build in isolation
@@ -490,7 +561,8 @@ Include the workflow name in your issue body to trigger a specific isolated work
 - `adw_sdlc_iso` - Complete SDLC in isolation
 
 **Example Issue:**
-```
+
+```text
 Title: Add export functionality
 Body: Please add the ability to export data to CSV.
 Include workflow: adw_plan_build_iso
@@ -524,12 +596,14 @@ agents/                    # Shared state location (not in worktree)
 ### Port Allocation
 
 Each isolated instance gets unique ports:
+
 - Backend: 9100-9114 (15 ports)
 - Frontend: 9200-9214 (15 ports)
 - Deterministic assignment based on ADW ID hash
 - Automatic fallback if preferred ports are busy
 
 **Port Assignment Algorithm:**
+
 ```python
 def get_ports_for_adw(adw_id: str) -> Tuple[int, int]:
     """Deterministically assign ports based on ADW ID."""
@@ -540,7 +614,8 @@ def get_ports_for_adw(adw_id: str) -> Tuple[int, int]:
 ```
 
 **Example Allocations:**
-```
+
+```text
 ADW abc12345: Backend 9107, Frontend 9207
 ADW def67890: Backend 9103, Frontend 9203
 ```
@@ -577,6 +652,7 @@ rm -rf trees/abc12345
 ```
 
 **Best Practices:**
+
 - Remove worktrees after PR merge
 - Monitor disk usage (each worktree is a full repo copy)
 - Use `git worktree prune` periodically
@@ -585,6 +661,7 @@ rm -rf trees/abc12345
 ## Troubleshooting
 
 ### Environment Issues
+
 ```bash
 # Check required variables
 env | grep -E "(GITHUB|ANTHROPIC|CLAUDE)"
@@ -599,6 +676,7 @@ claude --version
 ### Common Errors
 
 **"No worktree found"**
+
 ```bash
 # Check if worktree exists
 git worktree list
@@ -607,6 +685,7 @@ uv run adw_plan_iso.py <issue-number>
 ```
 
 **"Port already in use"**
+
 ```bash
 # Check what's using the port
 lsof -i :9107
@@ -614,6 +693,7 @@ lsof -i :9107
 ```
 
 **"Worktree validation failed"**
+
 ```bash
 # Check worktree state
 cat agents/<adw-id>/adw_state.json | jq .worktree_path
@@ -622,12 +702,14 @@ ls -la trees/<adw-id>/
 ```
 
 **"Agent execution failed"**
+
 ```bash
 # Check agent output in worktree
 cat trees/<adw-id>/agents/*/planner/raw_output.jsonl | tail -1 | jq .
 ```
 
 ### Debug Mode
+
 ```bash
 export ADW_DEBUG=true
 uv run adw_plan_build_iso.py 123  # Verbose output
@@ -636,7 +718,9 @@ uv run adw_plan_build_iso.py 123  # Verbose output
 ## Configuration
 
 ### ADW Tracking
+
 Each workflow run gets a unique 8-character ID (e.g., `a1b2c3d4`) that appears in:
+
 - Issue comments: `a1b2c3d4_ops: ✅ Starting ADW workflow`
 - Output files: `agents/a1b2c3d4/sdlc_planner/raw_output.jsonl`
 - Git commits and PRs
@@ -649,8 +733,8 @@ ADW supports dynamic model selection based on workflow complexity. Users can spe
 
 Include `model_set base` or `model_set heavy` in your GitHub issue or comment:
 
-```
-Title: Add export functionality  
+```text
+Title: Add export functionality
 Body: Please add the ability to export data to CSV.
 Include workflow: adw_plan_build_iso model_set heavy
 ```
@@ -673,6 +757,7 @@ SLASH_COMMAND_MODEL_MAP = {
 #### Commands Using Opus in Heavy Mode
 
 The following commands switch to Opus when using the heavy model set:
+
 - `/implement` - Complex implementation tasks
 - `/resolve_failed_test` - Debugging test failures
 - `/resolve_failed_e2e_test` - Debugging E2E test failures
@@ -696,12 +781,14 @@ python adws/adw_tests/test_model_selection.py
 ```
 
 This verifies:
+
 - All commands have both base and heavy mappings
 - Model selection logic works correctly
 - State persistence includes model_set
 - Default behavior when no state exists
 
 ### Modular Architecture
+
 The system uses a modular architecture optimized for isolated execution:
 
 - **State Management**: `ADWState` tracks worktree paths and ports
@@ -714,7 +801,7 @@ The system uses a modular architecture optimized for isolated execution:
 
 Each ADW workflow creates an isolated workspace:
 
-```
+```text
 agents/
 └── {adw_id}/                     # Unique workflow directory
     ├── adw_state.json            # Persistent state file
@@ -753,6 +840,7 @@ app_docs/                         # Generated documentation
 ### Core Components
 
 #### Modules
+
 - `adw_modules/agent.py` - Claude Code CLI integration with worktree support
 - `adw_modules/data_types.py` - Pydantic models including worktree fields
 - `adw_modules/github.py` - GitHub API operations
@@ -763,16 +851,19 @@ app_docs/                         # Generated documentation
 - `adw_modules/utils.py` - Utility functions
 
 #### Entry Point Workflows (Create Worktrees)
+
 - `adw_plan_iso.py` - Isolated planning workflow
 - `adw_patch_iso.py` - Isolated patch workflow
 
 #### Dependent Workflows (Require Worktrees)
+
 - `adw_build_iso.py` - Isolated implementation workflow
 - `adw_test_iso.py` - Isolated testing workflow
 - `adw_review_iso.py` - Isolated review workflow
 - `adw_document_iso.py` - Isolated documentation workflow
 
 #### Orchestrators
+
 - `adw_plan_build_iso.py` - Plan & build in isolation
 - `adw_plan_build_test_iso.py` - Plan & build & test in isolation
 - `adw_plan_build_test_review_iso.py` - Plan & build & test & review in isolation
@@ -781,7 +872,9 @@ app_docs/                         # Generated documentation
 - `adw_sdlc_iso.py` - Complete SDLC in isolation
 
 ### Branch Naming
-```
+
+```text
 {type}-{issue_number}-{adw_id}-{slug}
 ```
+
 Example: `feat-456-e5f6g7h8-add-user-authentication`
