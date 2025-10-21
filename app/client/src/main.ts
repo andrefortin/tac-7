@@ -124,10 +124,10 @@ function initializeFileUpload() {
   const dropZone = document.getElementById('drop-zone') as HTMLDivElement;
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const browseButton = document.getElementById('browse-button') as HTMLButtonElement;
-  
+
   // Browse button click
   browseButton.addEventListener('click', () => fileInput.click());
-  
+
   // File input change
   fileInput.addEventListener('change', (e) => {
     const files = (e.target as HTMLInputElement).files;
@@ -135,24 +135,146 @@ function initializeFileUpload() {
       handleFileUpload(files[0]);
     }
   });
-  
-  // Drag and drop
+
+  // Drag and drop for modal drop zone
   dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
     dropZone.classList.add('dragover');
   });
-  
+
   dropZone.addEventListener('dragleave', () => {
     dropZone.classList.remove('dragover');
   });
-  
+
   dropZone.addEventListener('drop', async (e) => {
     e.preventDefault();
     dropZone.classList.remove('dragover');
-    
+
     const files = e.dataTransfer?.files;
     if (files && files.length > 0) {
       handleFileUpload(files[0]);
+    }
+  });
+
+  // Helper function to create overlay
+  function createDropOverlay() {
+    const overlay = document.createElement('div');
+    overlay.className = 'drop-overlay';
+    overlay.innerHTML = '<p>Drop to create table</p>';
+    overlay.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(102, 126, 234, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      border: 2px dashed var(--primary-color);
+      border-radius: 8px;
+      font-size: 1.2rem;
+      color: var(--primary-color);
+    `;
+    return overlay;
+  }
+
+  // Extended drag and drop for upper div (query-section)
+  const querySection = document.getElementById('query-section') as HTMLDivElement;
+  let queryOverlay: HTMLDivElement | null = null;
+  querySection.style.position = 'relative';
+
+  querySection.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    querySection.classList.add('dragover');
+    if (!queryOverlay) {
+      queryOverlay = createDropOverlay();
+      querySection.appendChild(queryOverlay);
+    }
+  });
+
+  querySection.addEventListener('dragleave', (e) => {
+    if (e.currentTarget === querySection || !querySection.contains(e.relatedTarget as Node)) {
+      querySection.classList.remove('dragover');
+      if (queryOverlay) {
+        queryOverlay.remove();
+        queryOverlay = null;
+      }
+    }
+  });
+
+  querySection.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    querySection.classList.remove('dragover');
+    if (queryOverlay) {
+      queryOverlay.remove();
+      queryOverlay = null;
+    }
+
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 1) {
+      displayError('Only one file can be uploaded at a time. Please drop a single file.');
+      return;
+    }
+    if (files && files.length > 0) {
+      const file = files[0];
+      const validTypes = ['.csv', '.json', '.jsonl'];
+      const fileName = file.name.toLowerCase();
+      if (!validTypes.some(type => fileName.endsWith(type))) {
+        displayError('Invalid file type. Please upload .csv, .json, or .jsonl files.');
+        return;
+      }
+      await handleFileUpload(file);
+    }
+  });
+
+  // Extended drag and drop for lower div (tables-section)
+  const tablesSection = document.getElementById('tables-section') as HTMLDivElement;
+  let tablesOverlay: HTMLDivElement | null = null;
+  tablesSection.style.position = 'relative';
+
+  tablesSection.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    tablesSection.classList.add('dragover');
+    if (!tablesOverlay) {
+      tablesOverlay = createDropOverlay();
+      tablesSection.appendChild(tablesOverlay);
+    }
+  });
+
+  tablesSection.addEventListener('dragleave', (e) => {
+    if (e.currentTarget === tablesSection || !tablesSection.contains(e.relatedTarget as Node)) {
+      tablesSection.classList.remove('dragover');
+      if (tablesOverlay) {
+        tablesOverlay.remove();
+        tablesOverlay = null;
+      }
+    }
+  });
+
+  tablesSection.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    tablesSection.classList.remove('dragover');
+    if (tablesOverlay) {
+      tablesOverlay.remove();
+      tablesOverlay = null;
+    }
+
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 1) {
+      displayError('Only one file can be uploaded at a time. Please drop a single file.');
+      return;
+    }
+    if (files && files.length > 0) {
+      const file = files[0];
+      const validTypes = ['.csv', '.json', '.jsonl'];
+      const fileName = file.name.toLowerCase();
+      if (!validTypes.some(type => fileName.endsWith(type))) {
+        displayError('Invalid file type. Please upload .csv, .json, or .jsonl files.');
+        return;
+      }
+      await handleFileUpload(file);
     }
   });
 }
